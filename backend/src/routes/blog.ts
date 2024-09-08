@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import { PrismaClient } from '@prisma/client/edge';
 import { withAccelerate } from '@prisma/extension-accelerate';
 import { verify } from 'hono/jwt';
+import { createBlogInput, updateBlogInput } from "@uday086/medium-common";
 
 export const blogRouter = new Hono<{
     Bindings: {
@@ -17,8 +18,8 @@ blogRouter.use('/*', async (c, next) => {
     const header = c.req.header("Authorization") || "";
 
     try {
-        console.log(header);
         const user = await verify(header, c.env.JWT_SECRET);
+        
         if (user) {
             c.set("userId", user.id);
             await next();
@@ -44,15 +45,22 @@ blogRouter.post('/', async (c) => {
     }).$extends(withAccelerate());
 
     const body = await c.req.json();
+    const { success } = createBlogInput.safeParse(body)
+    if(!success){
+        c.status(411)
+        return c.json({
+        message : "Inputs are incorrect"
+        })
+    }
     const post = await prisma.post.create({
         data: {
             title: body.title,
             content: body.content,
-            authorId: Number(authorId)
+            authorId: (authorId)
         }
     });
     return c.json({
-        id: post.id
+        post
     });
 });
 
@@ -62,6 +70,13 @@ blogRouter.put('/', async (c) => {
     }).$extends(withAccelerate());
 
     const body = await c.req.json();
+    const { success } = updateBlogInput.safeParse(body)
+    if(!success){
+        c.status(411)
+        return c.json({
+        message : "Inputs are incorrect"
+        })
+    }
     const post = await prisma.post.update({
         where: {
             id: body.id
