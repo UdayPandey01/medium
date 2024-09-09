@@ -89,7 +89,7 @@ blogRouter.put('/', async (c) => {
     return c.json({ id: post.id });
 });
 
-blogRouter.get('/:id', async (c) => {
+blogRouter.get('/blog/:id', async (c) => {
     const id = c.req.param('id');
     const prisma = new PrismaClient({
         datasourceUrl: c.env.DATABASE_URL,
@@ -109,10 +109,32 @@ blogRouter.get('/:id', async (c) => {
 });
 
 blogRouter.get('/bulk', async (c) => {
+
+    console.log("Connected to DB:", c.env.DATABASE_URL);
     const prisma = new PrismaClient({
         datasourceUrl: c.env.DATABASE_URL,
     }).$extends(withAccelerate());
 
-    const post = await prisma.post.findMany({});
-    return c.json({ post });
+    console.log("Connected to DB:", c.env.DATABASE_URL);
+
+    try{
+        const post = await prisma.post.findMany({
+            select : {
+                title : true,
+                content : true,
+                id : true,
+                author :{
+                    select : {
+                        name : true
+                    }
+                }
+            }
+        });
+        return c.json({ post });
+    }catch(e){
+        console.log(e)
+        c.status(403)
+        return c.json({msg : "Error"})
+    }
+    
 });

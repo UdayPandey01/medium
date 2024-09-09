@@ -45,13 +45,6 @@ userRouter.post('/signup', async(c) => {
   }).$extends(withAccelerate())
   
     const body = await c.req.json()
-    const { success } = signinInput.safeParse(body)
-    if(!success){
-      c.status(411)
-      return c.json({
-        message : "Inputs are incorrect"
-      })
-    }
     const user = await prisma.user.findUnique({
       where:{
         email : body.email,
