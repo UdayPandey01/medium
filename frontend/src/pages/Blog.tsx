@@ -4,10 +4,11 @@ import { FullBlog } from "../components/FullBlog"
 
 export const Blog = () => {
   const {id} = useParams()
+  console.log(id)
   const {loading, blog} = useBlog({
     id : id || ""
   })
-  if(loading){
+  if(loading || !blog){
     return <div>
       loading...
     </div>

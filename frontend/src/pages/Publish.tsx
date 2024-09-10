@@ -32,13 +32,13 @@ export const Publish = () => {
             onClick={async () => {
               const response = await axios.post(`${BACKEND_URL}/api/v1/blog`, {
                 title,
-                content,
+                content
               },{
                 headers:{
                   Authorization : localStorage.getItem("token")
                 }
               });
-              navigate(`/blog/${response.data.id}`);
+              navigate(`/blog/${response.data.post.id}`);
             }}
             className="inline-flex items-center px-5 py-2.5 text-sm font-medium text-center text-white bg-blue-700 rounded-lg focus:ring-4 focus:ring-blue-200 hover:bg-blue-800 mt-3"
           >
