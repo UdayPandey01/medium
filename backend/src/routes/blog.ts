@@ -99,6 +99,16 @@ blogRouter.get('/blog/:id', async (c) => {
         const post = await prisma.post.findFirst({
             where: {
                 id
+            },
+            select:{
+                id : true,
+                title : true,
+                content : true,
+                author : {
+                    select : {
+                        name : true
+                    }
+                }
             }
         });
         return c.json({ post });
@@ -110,6 +120,7 @@ blogRouter.get('/blog/:id', async (c) => {
 
 blogRouter.get('/bulk', async (c) => {
 
+    console.log("123")
     console.log("Connected to DB:", c.env.DATABASE_URL);
     const prisma = new PrismaClient({
         datasourceUrl: c.env.DATABASE_URL,
